@@ -1,7 +1,7 @@
 function to_boolean(input)
-    if input == "true" then
+    if input == "True" then
         return true
-    elseif input == "false" then
+    elseif input == "False" then
         return false
     else
         return nil
@@ -20,7 +20,7 @@ end
 -- 从 CLI 获取参数
 local rows = tonumber(app.params["rows"])
 local columns = tonumber(app.params["columns"])
-local is_outline = to_boolean(app.params["is_outline"]) or true
+local is_outline = to_boolean(app.params["is_outline"] or "True")
 -- local rows = 1
 -- local columns = 4
 
@@ -46,16 +46,21 @@ app.command.ImportSpriteSheet{
   type=SpriteSheetType.ROWS,
   frameBounds=Rectangle(0, 0, frameWidth, frameHeight)
 }
+
 -- add outline
-for i, frame in ipairs(app.sprite.frames) do
-  app.frame = frame
-  app.command.Outline {
-    ui=false,
-    color= Color{r = 0, g = 0, b = 0, a = 255},
-  }
+if is_outline then
+  for i, frame in ipairs(app.sprite.frames) do
+    app.frame = frame
+    app.command.Outline {
+      ui=false,
+      color= Color{r = 0, g = 0, b = 0, a = 255},
+    }
+  end
 end
 -- export frame to png
-local outputPath = app.fs.filePathAndTitle(app.sprite.filename) .. ".png"
+local path = app.fs.filePath(app.sprite.filename)
+local filename = app.fs.fileName(app.sprite.filename)
+local outputPath = app.fs.joinPath(path, "output", filename)
 print(outputPath)
 app.sprite:saveAs(outputPath)
 
